@@ -1,4 +1,4 @@
-                    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -71,7 +71,7 @@
         button:hover {
             background-color: #e68900;
         }
-        .member-list, .chat-section {
+        .member-list {
             text-align: left;
             margin-top: 20px;
         }
@@ -97,26 +97,117 @@
         .member-info {
             flex-grow: 1;
         }
-        .chat-box {
-            border: 1px solid #ccc;
-            height: 200px;
-            border-radius: 5px;
-            overflow-y: scroll;
-            padding: 10px;
-            background: #fafafa;
-            margin-bottom: 10px;
+        /* Botão flutuante do chat */
+        #chat-float-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 999;
+            border: none;
+        }
+        #chat-float-btn:hover {
+            background-color: #1ebe57;
+        }
+        /* Tela cheia do Chat */
+        #chat-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #25d366;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .chat-back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #efeae2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .chat-msg {
-            margin-bottom: 8px;
-            padding: 5px 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 75%;
             word-break: break-all;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            align-self: flex-start;
         }
         .chat-msg img {
             max-width: 100%;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-top: 5px;
+        }
+        .chat-input-area {
+            padding: 10px;
+            background-color: #f0f0f0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .chat-input-area input[type="text"] {
+            margin: 0;
+            flex-grow: 1;
+        }
+        .chat-input-area input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            background-color: #ccc;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .file-label:hover {
+            background-color: #b3b3b3;
+        }
+        .chat-input-area button {
+            margin: 0;
+            width: auto;
+            padding: 10px 20px;
+            background-color: #25d366;
+        }
+        .chat-input-area button:hover {
+            background-color: #1ebe57;
         }
     </style>
 </head>
@@ -148,13 +239,23 @@
             
             <div id="lista-membros"></div>
         </div>
+    </div>
 
-        <div class="chat-section">
-            <h4>Chat do Grupo</h4>
-            <div id="chat-box" class="chat-box"></div>
-            <input type="text" id="chat-texto" placeholder="Digite sua mensagem...">
-            <input type="file" id="chat-file-input" accept="image/*">
-            <button onclick="enviarMensagem()">Enviar Mensagem</button>
+    <!-- Botão Flutuante do Chat -->
+    <button id="chat-float-btn" onclick="abrirChat()" style="display:none;">💬</button>
+
+    <!-- Tela Cheia do Chat -->
+    <div id="chat-fullscreen">
+        <div class="chat-header">
+            <button class="chat-back-btn" onclick="fecharChat()">➔</button>
+            <span>Chat</span>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-area">
+            <label for="chat-file-input" class="file-label">📷</label>
+            <input type="file" id="chat-file-input" accept="image/*" onchange="mostrarNomeArquivo()">
+            <input type="text" id="chat-texto" placeholder="Digite uma mensagem...">
+            <button onclick="enviarMensagemChat()">Enviar</button>
         </div>
     </div>
 
@@ -180,6 +281,7 @@
             if (senha === "123Davi*") {
                 document.getElementById("login-screen").style.display = "none";
                 document.getElementById("main-screen").style.display = "block";
+                document.getElementById("chat-float-btn").style.display = "flex";
                 carregarTudo();
             } else {
                 alert("Senha incorreta!");
@@ -329,25 +431,41 @@
             }
         }
 
-        window.enviarMensagem = async function() {
-            const texto = document.getElementById("chat-texto").value;
+        // Funções do Chat
+        window.abrirChat = function() {
+            document.getElementById("chat-fullscreen").style.display = "flex";
+            carregarChat();
+        }
+
+        window.fecharChat = function() {
+            document.getElementById("chat-fullscreen").style.display = "none";
+        }
+
+        window.mostrarNomeArquivo = function() {
+            const fileInput = document.getElementById("chat-file-input");
+            if (fileInput.files.length > 0) {
+                alert("Imagem selecionada com sucesso! Agora é só clicar em Enviar.");
+            }
+        }
+
+        window.enviarMensagemChat = async function() {
+            const texto = document.getElementById("chat-texto").value.trim();
             const fileInput = document.getElementById("chat-file-input");
             const file = fileInput.files[0];
 
             if (texto === "" && !file) {
-                alert("Digite uma mensagem ou selecione uma imagem!");
+                alert("Digite um texto ou selecione uma imagem para enviar!");
                 return;
             }
 
-            let imagemBase64 = "";
             if (file) {
-                comprimirImagem(file, async function(base64) {
-                    salvarMensagemNoBanco(texto, base64);
+                comprimirImagem(file, async function(base64Image) {
+                    await salvarMensagemNoBanco(texto, base64Image);
                 });
             } else {
-                salvarMensagemNoBanco(texto, "");
+                await salvarMensagemNoBanco(texto, "");
             }
-        };
+        }
 
         async function salvarMensagemNoBanco(texto, imagem) {
             try {
@@ -361,11 +479,12 @@
                 carregarChat();
             } catch (e) {
                 console.error("Erro ao enviar mensagem:", e);
+                alert("Erro ao enviar mensagem. Tente novamente.");
             }
         }
 
         async function carregarChat() {
-            const chatBox = document.getElementById("chat-box");
+            const chatMessages = document.getElementById("chat-messages");
             try {
                 const querySnapshot = await getDocs(collection(db, "chat"));
                 let mensagens = [];
@@ -374,12 +493,13 @@
                 });
                 mensagens.sort((a, b) => a.timestamp - b.timestamp);
 
-                chatBox.innerHTML = "";
+                chatMessages.innerHTML = "";
                 mensagens.forEach((msg) => {
-                    let imgHtml = msg.imagem ? `<br><img src="${msg.imagem}">` : "";
-                    chatBox.innerHTML += `<div class="chat-msg">${msg.texto}${imgHtml}</div>`;
+                    let textoHtml = msg.texto ? `<div>${msg.texto}</div>` : "";
+                    let imgHtml = msg.imagem ? `<img src="${msg.imagem}">` : "";
+                    chatMessages.innerHTML += `<div class="chat-msg">${textoHtml}${imgHtml}</div>`;
                 });
-                chatBox.scrollTop = chatBox.scrollHeight;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             } catch (e) {
                 console.error("Erro ao carregar chat:", e);
             }
@@ -388,8 +508,8 @@
         function carregarTudo() {
             carregarFotoGrupo();
             carregarMembros();
-            carregarChat();
         }
     </script>
 </body>
 </html>
+                                
