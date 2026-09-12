@@ -1,107 +1,167 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grupo dos melhores amigos</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; text-align: center; }
-    header { background-color: #ff6f00; color: white; padding: 20px; }
-    h1 { margin: 0; font-size: 28px; }
-    h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: normal; opacity: 0.9; }
-    .container { padding: 20px; max-width: 500px; margin: auto; }
-    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px; }
-    input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; width: 80%; font-size: 16px; }
-    button { background-color: #ff6f00; color: white; border: none; cursor: pointer; font-weight: bold; }
-    button:hover { background-color: #e66000; }
-    .hidden { display: none; }
-    ul { list-style-type: none; padding: 0; }
-    li { background: #eee; margin: 5px 0; padding: 10px; border-radius: 5px; }
-  </style>
-  
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo dos Melhores Amigos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .header {
+            background-color: #ff8c00;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
+            cursor: pointer;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #ff8c00;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e07b00;
+        }
+        .hidden {
+            display: none;
+        }
+        #grupo-foto {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            display: none;
+            border: 2px solid white;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
+        li {
+            background: #f9f9f9;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border-left: 4px solid #ff8c00;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>Grupo dos melhores amigos</h1>
-    <h2>Grupo do Davi</h2>
-  </header>
+    <div class="container">
+        <!-- Tela de Login -->
+        <div id="login-screen">
+            <h2>Digite a Senha do Grupo</h2>
+            <input type="password" id="senha-input" placeholder="Senha de acesso">
+            <button onclick="verificarSenha()">Entrar</button>
+        </div>
 
-  <div class="container">
-    <!-- TELA DE LOGIN -->
-    <div id="login-screen" class="card">
-      <h3>Digite a Senha do Grupo</h3>
-      <input type="password" id="password-input" placeholder="Senha de acesso">
-      <br>
-      <button onclick="checkPassword()">Entrar</button>
-      <p id="error-msg" style="color: red; display: none;">Senha incorreta!</p>
+        <!-- Tela Principal do Grupo -->
+        <div id="grupo-screen" class="hidden">
+            <div class="header" onclick="mudarFotoGrupo()">
+                <img id="grupo-foto" src="" alt="Foto do Grupo">
+                <h1 id="titulo-grupo">Grupo dos Melhores Amigos</h1>
+                <p>Grupo do Davi</p>
+            </div>
+            
+            <h3>Membros do Grupo</h3>
+            <input type="text" id="nome-membro" placeholder="Nome do amigo">
+            <input type="text" id="profissao-membro" placeholder="Profissão do membro">
+            <button onclick="adicionarMembro()">Adicionar Membro</button>
+
+            <ul id="lista-membros"></ul>
+        </div>
     </div>
 
-    <!-- PAINEL PRINCIPAL DO GRUPO -->
-    <div id="main-screen" class="card hidden">
-      <h3>Membros do Grupo</h3>
-      <input type="text" id="member-name" placeholder="Nome do amigo">
-      <button onclick="addMember()">Adicionar Membro</button>
+    <input type="file" id="input-file-foto" accept="image/*" class="hidden" onchange="carregarFotoGrupo(event)">
 
-      <ul id="members-list"></ul>
-    </div>
-  </div>
+    <script>
+        function verificarSenha() {
+            const senha = document.getElementById('senha-input').value;
+            if (senha === "123Davi*") {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('grupo-screen').classList.remove('hidden');
+            } else {
+                alert("Senha incorreta!");
+            }
+        }
 
-  <script>
-    // Configurações e Chaves do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBqWMb17OeeZDHBK_U1TMw2p6tMAz2x82g",
-      authDomain: "grupo-dos-melhores-amigos.firebaseapp.com",
-      projectId: "grupo-dos-melhores-amigos",
-      storageBucket: "grupo-dos-melhores-amigos.firebasestorage.app",
-      messagingSenderId: "712550275631",
-      appId: "1:712550275631:web:bbe1b57c155d50669f84da",
-      databaseURL: "https://grupo-dos-melhores-amigos-default-rtdb.firebaseio.com"
-    };
+        function mudarFotoGrupo() {
+            document.getElementById('input-file-foto').click();
+        }
 
-    // Inicializa o Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+        function carregarFotoGrupo(event) {
+            const arquivo = event.target.files[0];
+            if (arquivo) {
+                const leitor = new FileReader();
+                leitor.onload = function(e) {
+                    const foto = document.getElementById('grupo-foto');
+                    foto.src = e.target.result;
+                    foto.style.display = 'inline-block';
+                }
+                leitor.readAsDataURL(arquivo);
+            }
+        }
 
-    // Verificação de Senha
-    function checkPassword() {
-      const input = document.getElementById("password-input").value;
-      if (input === "123Davi*") {
-        document.getElementById("login-screen").classList.add("hidden");
-        document.getElementById("main-screen").classList.remove("hidden");
-        loadMembers();
-      } else {
-        document.getElementById("error-msg").style.display = "block";
-      }
-    }
+        function adicionarMembro() {
+            const nomeInput = document.getElementById('nome-membro');
+            const profissaoInput = document.getElementById('profissao-membro');
+            const lista = document.getElementById('lista-membros');
 
-    // Salvar novo membro no Firebase
-    function addMember() {
-      const nameInput = document.getElementById("member-name");
-      const name = nameInput.value.trim();
-      if (name !== "") {
-        database.ref("membros").push({ nome: name });
-        nameInput.value = "";
-      }
-    }
+            const nome = nomeInput.value.trim();
+            const profissao = profissaoInput.value.trim();
 
-    // Carregar lista de membros em tempo real da memória na nuvem
-    function loadMembers() {
-      database.ref("membros").on("value", (snapshot) => {
-        const list = document.getElementById("members-list");
-        list.innerHTML = "";
-        snapshot.forEach((childSnapshot) => {
-          const member = childSnapshot.val();
-          const li = document.createElement("li");
-          li.textContent = member.nome;
-          list.appendChild(li);
-        });
-      });
-    }
-  </script>
+            if (nome === "" || profissao === "") {
+                alert("Por favor, preencha o nome e a profissão do membro!");
+                return;
+            }
+
+            const item = document.createElement('li');
+            item.innerHTML = `<strong>${nome}</strong> - ${profissao}`;
+            lista.appendChild(item);
+
+            nomeInput.value = "";
+            profissaoInput.value = "";
+        }
+    </script>
 
 </body>
 </html>
