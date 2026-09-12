@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                                    .<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -259,22 +259,17 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "seu-projeto.firebaseapp.com",
-            projectId: "seu-projeto",
-            storageBucket: "seu-projeto.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcde"
+    <script>
+        // Sistema interno usando localStorage para simular memória local sem Firebase
+        let dadosGrupo = JSON.parse(localStorage.getItem("dados_grupo_melhores_amigos")) || {
+            fotoGrupo: "",
+            membros: [],
+            mensagens: []
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        function salvarLocalmente() {
+            localStorage.setItem("dados_grupo_melhores_amigos", JSON.stringify(dadosGrupo));
+        }
 
         window.verificarSenha = function() {
             const senha = document.getElementById("senha-input").value;
@@ -325,55 +320,48 @@
         window.alterarFotoGrupo = function(event) {
             const file = event.target.files[0];
             if (file) {
-                comprimirImagem(file, async function(base64Image) {
-                    try {
-                        await setDoc(doc(db, "config", "grupo"), { foto: base64Image }, { merge: true });
-                        carregarFotoGrupo();
-                    } catch (e) {
-                        console.error("Erro ao salvar foto do grupo:", e);
-                    }
+                comprimirImagem(file, function(base64Image) {
+                    dadosGrupo.fotoGrupo = base64Image;
+                    salvarLocalmente();
+                    carregarFotoGrupo();
                 });
             }
         };
 
-        async function carregarFotoGrupo() {
-            try {
-                const docSnap = await getDoc(doc(db, "config", "grupo"));
-                if (docSnap.exists() && docSnap.data().foto) {
-                    const imgElement = document.getElementById("group-avatar-img");
-                    imgElement.src = docSnap.data().foto;
-                    imgElement.style.display = "block";
-                    document.getElementById("group-avatar-placeholder").style.display = "none";
-                }
-            } catch (e) {
-                console.error("Erro ao carregar foto do grupo:", e);
+        function carregarFotoGrupo() {
+            if (dadosGrupo.fotoGrupo) {
+                const imgElement = document.getElementById("group-avatar-img");
+                imgElement.src = dadosGrupo.fotoGrupo;
+                imgElement.style.display = "block";
+                document.getElementById("group-avatar-placeholder").style.display = "none";
             }
         }
 
-        window.adicionarMembro = async function() {
-            const nome = document.getElementById("nome-input").value;
-            const profissao = document.getElementById("profissao-input").value;
+        window.adicionarMembro = function() {
+            const nome = document.getElementById("nome-input").value.trim();
+            const profissao = document.getElementById("profissao-input").value.trim();
 
             if (nome === "" || profissao === "") {
                 alert("Preencha todos os campos!");
                 return;
             }
 
-            try {
-                await addDoc(collection(db, "membros"), {
-                    nome: nome,
-                    profissao: profissao,
-                    foto: ""
-                });
-                document.getElementById("nome-input").value = "";
-                document.getElementById("profissao-input").value = "";
-                carregarMembros();
-            } catch (e) {
-                console.error("Erro ao adicionar membro: ", e);
-            }
+            const novoMembro = {
+                id: Date.now().toString(),
+                nome: nome,
+                profissao: profissao,
+                foto: ""
+            };
+
+            dadosGrupo.membros.push(novoMembro);
+            salvarLocalmente();
+
+            document.getElementById("nome-input").value = "";
+            document.getElementById("profissao-input").value = "";
+            carregarMembros();
         };
 
-        window.gerenciarMembro = async function(id, nomeAtual) {
+        window.gerenciarMembro = function(id, nomeAtual) {
             const acao = prompt(`O que você quer fazer com ${nomeAtual}?\n1 - Adicionar/Alterar foto\n2 - Excluir membro`);
             if (acao === "1") {
                 const input = document.createElement('input');
@@ -382,12 +370,12 @@
                 input.onchange = e => {
                     const file = e.target.files[0];
                     if (file) {
-                        comprimirImagem(file, async function(base64Image) {
-                            try {
-                                await updateDoc(doc(db, "membros", id), { foto: base64Image });
+                        comprimirImagem(file, function(base64Image) {
+                            const membro = dadosGrupo.membros.find(m => m.id === id);
+                            if (membro) {
+                                membro.foto = base64Image;
+                                salvarLocalmente();
                                 carregarMembros();
-                            } catch (err) {
-                                console.error("Erro ao atualizar foto do membro:", err);
                             }
                         });
                     }
@@ -395,40 +383,33 @@
                 input.click();
             } else if (acao === "2") {
                 if (confirm(`Tem certeza que deseja excluir ${nomeAtual}?`)) {
-                    try {
-                        await deleteDoc(doc(db, "membros", id));
-                        carregarMembros();
-                    } catch (err) {
-                        console.error("Erro ao excluir membro:", err);
-                    }
+                    dadosGrupo.membros = dadosGrupo.membros.filter(m => m.id !== id);
+                    salvarLocalmente();
+                    carregarMembros();
                 }
             }
         };
 
-        async function carregarMembros() {
+        function carregarMembros() {
             const listaDiv = document.getElementById("lista-membros");
-            listaDiv.innerHTML = "Carregando...";
+            listaDiv.innerHTML = "";
             
-            try {
-                const querySnapshot = await getDocs(collection(db, "membros"));
-                listaDiv.innerHTML = "";
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const fotoSrc = data.foto ? data.foto : "";
-                    const avatarHtml = fotoSrc ? `<img src="${fotoSrc}" class="member-avatar">` : `<div class="member-avatar" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">Foto</div>`;
-                    
-                    listaDiv.innerHTML += `
-                        <div class="member-item" onclick="gerenciarMembro('${docSnap.id}', '${data.nome}')">
-                            ${avatarHtml}
-                            <div class="member-info">
-                                <strong>${data.nome}</strong> - ${data.profissao}
-                            </div>
-                        </div>`;
-                });
-            } catch (e) {
-                listaDiv.innerHTML = "Erro ao carregar membros.";
-                console.error("Erro: ", e);
+            if (dadosGrupo.membros.length === 0) {
+                listaDiv.innerHTML = "<p style='color:#777; font-size:14px;'>Nenhum membro adicionado ainda.</p>";
+                return;
             }
+
+            dadosGrupo.membros.forEach((membro) => {
+                const avatarHtml = membro.foto ? `<img src="${membro.foto}" class="member-avatar">` : `<div class="member-avatar" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">Foto</div>`;
+                
+                listaDiv.innerHTML += `
+                    <div class="member-item" onclick="gerenciarMembro('${membro.id}', '${membro.nome}')">
+                        ${avatarHtml}
+                        <div class="member-info">
+                            <strong>${membro.nome}</strong> - ${membro.profissao}
+                        </div>
+                    </div>`;
+            });
         }
 
         // Funções do Chat
@@ -448,7 +429,7 @@
             }
         }
 
-        window.enviarMensagemChat = async function() {
+        window.enviarMensagemChat = function() {
             const texto = document.getElementById("chat-texto").value.trim();
             const fileInput = document.getElementById("chat-file-input");
             const file = fileInput.files[0];
@@ -459,50 +440,41 @@
             }
 
             if (file) {
-                comprimirImagem(file, async function(base64Image) {
-                    await salvarMensagemNoBanco(texto, base64Image);
+                comprimirImagem(file, function(base64Image) {
+                    salvarMensagemNaMemoria(texto, base64Image);
                 });
             } else {
-                await salvarMensagemNoBanco(texto, "");
+                salvarMensagemNaMemoria(texto, "");
             }
         }
 
-        async function salvarMensagemNoBanco(texto, imagem) {
-            try {
-                await addDoc(collection(db, "chat"), {
-                    texto: texto,
-                    imagem: imagem,
-                    timestamp: Date.now()
-                });
-                document.getElementById("chat-texto").value = "";
-                document.getElementById("chat-file-input").value = "";
-                carregarChat();
-            } catch (e) {
-                console.error("Erro ao enviar mensagem:", e);
-                alert("Erro ao enviar mensagem. Tente novamente.");
-            }
+        function salvarMensagemNaMemoria(texto, imagem) {
+            const novaMensagem = {
+                texto: texto,
+                imagem: imagem,
+                timestamp: Date.now()
+            };
+
+            dadosGrupo.mensagens.push(novaMensagem);
+            salvarLocalmente();
+
+            document.getElementById("chat-texto").value = "";
+            document.getElementById("chat-file-input").value = "";
+            carregarChat();
         }
 
-        async function carregarChat() {
+        function carregarChat() {
             const chatMessages = document.getElementById("chat-messages");
-            try {
-                const querySnapshot = await getDocs(collection(db, "chat"));
-                let mensagens = [];
-                querySnapshot.forEach((doc) => {
-                    mensagens.push(doc.data());
-                });
-                mensagens.sort((a, b) => a.timestamp - b.timestamp);
+            chatMessages.innerHTML = "";
 
-                chatMessages.innerHTML = "";
-                mensagens.forEach((msg) => {
-                    let textoHtml = msg.texto ? `<div>${msg.texto}</div>` : "";
-                    let imgHtml = msg.imagem ? `<img src="${msg.imagem}">` : "";
-                    chatMessages.innerHTML += `<div class="chat-msg">${textoHtml}${imgHtml}</div>`;
-                });
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            } catch (e) {
-                console.error("Erro ao carregar chat:", e);
-            }
+            dadosGrupo.mensagens.sort((a, b) => a.timestamp - b.timestamp);
+
+            dadosGrupo.mensagens.forEach((msg) => {
+                let textoHtml = msg.texto ? `<div>${msg.texto}</div>` : "";
+                let imgHtml = msg.imagem ? `<img src="${msg.imagem}">` : "";
+                chatMessages.innerHTML += `<div class="chat-msg">${textoHtml}${imgHtml}</div>`;
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function carregarTudo() {
@@ -512,4 +484,20 @@
     </script>
 </body>
 </html>
-                                
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBqWMb17OeeZDHBK_U1TMw2p6tMAz2x82g",
+  authDomain: "grupo-dos-melhores-amigos.firebaseapp.com",
+  projectId: "grupo-dos-melhores-amigos",
+  storageBucket: "grupo-dos-melhores-amigos.firebasestorage.app",
+  messagingSenderId: "712550275631",
+  appId: "1:712550275631:web:bbe1b57c155d50669f84da"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
