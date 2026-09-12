@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+            <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -7,161 +7,153 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+        }
+        header {
+            background-color: #ff9800;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
         }
         .container {
-            width: 100%;
-            max-width: 400px;
             background: white;
             padding: 20px;
+            margin-top: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
             text-align: center;
-        }
-        .header {
-            background-color: #ff8c00;
-            color: white;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
-            margin: -20px -20px 20px -20px;
-            cursor: pointer;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-        .header p {
-            margin: 5px 0 0 0;
-            font-size: 14px;
         }
         input, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            border-radius: 5px;
+            font-size: 16px;
         }
         button {
-            background-color: #ff8c00;
+            background-color: #ff9800;
             color: white;
             border: none;
             font-weight: bold;
             cursor: pointer;
         }
         button:hover {
-            background-color: #e07b00;
+            background-color: #e68900;
         }
-        .hidden {
-            display: none;
-        }
-        #grupo-foto {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            display: none;
-            border: 2px solid white;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        .member-list {
             text-align: left;
+            margin-top: 20px;
         }
-        li {
-            background: #f9f9f9;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border-left: 4px solid #ff8c00;
+        .member-item {
+            background: #fff3e0;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 5px solid #ff9800;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Tela de Login -->
-        <div id="login-screen">
-            <h2>Digite a Senha do Grupo</h2>
-            <input type="password" id="senha-input" placeholder="Senha de acesso">
-            <button onclick="verificarSenha()">Entrar</button>
-        </div>
+    <header>Grupo dos Melhores Amigos</header>
 
-        <!-- Tela Principal do Grupo -->
-        <div id="grupo-screen" class="hidden">
-            <div class="header" onclick="mudarFotoGrupo()">
-                <img id="grupo-foto" src="" alt="Foto do Grupo">
-                <h1 id="titulo-grupo">Grupo dos Melhores Amigos</h1>
-                <p>Grupo do Davi</p>
-            </div>
-            
-            <h3>Membros do Grupo</h3>
-            <input type="text" id="nome-membro" placeholder="Nome do amigo">
-            <input type="text" id="profissao-membro" placeholder="Profissão do membro">
+    <div id="login-screen" class="container">
+        <h2>Digite a Senha do Grupo</h2>
+        <input type="password" id="senha-input" placeholder="Senha de acesso">
+        <button onclick="verificarSenha()">Entrar</button>
+    </div>
+
+    <div id="main-screen" class="container" style="display: none;">
+        <h3>Grupo do Davi</h3>
+        
+        <div class="member-list">
+            <h4>Membros do Grupo</h4>
+            <input type="text" id="nome-input" placeholder="Nome do amigo">
+            <input type="text" id="profissao-input" placeholder="Profissão do membro">
             <button onclick="adicionarMembro()">Adicionar Membro</button>
-
-            <ul id="lista-membros"></ul>
+            
+            <div id="lista-membros"></div>
         </div>
     </div>
 
-    <input type="file" id="input-file-foto" accept="image/*" class="hidden" onchange="carregarFotoGrupo(event)">
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <script>
-        function verificarSenha() {
-            const senha = document.getElementById('senha-input').value;
-            if (senha === "123Davi*") {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('grupo-screen').classList.remove('hidden');
+        // Configuração do Firebase (Substitua pelos seus dados do Firebase se criar um projeto próprio)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "seu-projeto.firebaseapp.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcde"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.verificarSenha = function() {
+            const senha = document.getElementById("senha-input").value;
+            if (senha === "123456") { // Defina sua senha aqui
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-screen").style.display = "block";
+                carregarMembros();
             } else {
                 alert("Senha incorreta!");
             }
-        }
+        };
 
-        function mudarFotoGrupo() {
-            document.getElementById('input-file-foto').click();
-        }
-
-        function carregarFotoGrupo(event) {
-            const arquivo = event.target.files[0];
-            if (arquivo) {
-                const leitor = new FileReader();
-                leitor.onload = function(e) {
-                    const foto = document.getElementById('grupo-foto');
-                    foto.src = e.target.result;
-                    foto.style.display = 'inline-block';
-                }
-                leitor.readAsDataURL(arquivo);
-            }
-        }
-
-        function adicionarMembro() {
-            const nomeInput = document.getElementById('nome-membro');
-            const profissaoInput = document.getElementById('profissao-membro');
-            const lista = document.getElementById('lista-membros');
-
-            const nome = nomeInput.value.trim();
-            const profissao = profissaoInput.value.trim();
+        window.adicionarMembro = async function() {
+            const nome = document.getElementById("nome-input").value;
+            const profissao = document.getElementById("profissao-input").value;
 
             if (nome === "" || profissao === "") {
-                alert("Por favor, preencha o nome e a profissão do membro!");
+                alert("Preencha todos os campos!");
                 return;
             }
 
-            const item = document.createElement('li');
-            item.innerHTML = `<strong>${nome}</strong> - ${profissao}`;
-            lista.appendChild(item);
+            try {
+                await addDoc(collection(db, "membros"), {
+                    nome: nome,
+                    profissao: profissao
+                });
+                document.getElementById("nome-input").value = "";
+                document.getElementById("profissao-input").value = "";
+                carregarMembros();
+            } catch (e) {
+                console.error("Erro ao adicionar membro: ", e);
+            }
+        };
 
-            nomeInput.value = "";
-            profissaoInput.value = "";
+        async function carregarMembros() {
+            const listaDiv = document.getElementById("lista-membros");
+            listaDiv.innerHTML = "Carregando...";
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "membros"));
+                listaDiv.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    listaDiv.innerHTML += `<div class="member-item"><strong>${data.nome}</strong> - ${data.profissao}</div>`;
+                });
+            } catch (e) {
+                listaDiv.innerHTML = "Erro ao carregar membros.";
+                console.error("Erro: ", e);
+            }
         }
     </script>
-
 </body>
 </html>
