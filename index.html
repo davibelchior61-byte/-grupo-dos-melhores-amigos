@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grupo dos melhores amigos</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; text-align: center; }
+    header { background-color: #ff6f00; color: white; padding: 20px; }
+    h1 { margin: 0; font-size: 28px; }
+    h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: normal; opacity: 0.9; }
+    .container { padding: 20px; max-width: 500px; margin: auto; }
+    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px; }
+    input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; width: 80%; font-size: 16px; }
+    button { background-color: #ff6f00; color: white; border: none; cursor: pointer; font-weight: bold; }
+    button:hover { background-color: #e66000; }
+    .hidden { display: none; }
+    ul { list-style-type: none; padding: 0; }
+    li { background: #eee; margin: 5px 0; padding: 10px; border-radius: 5px; }
+  </style>
+  
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>Grupo dos melhores amigos</h1>
+    <h2>Grupo do Davi</h2>
+  </header>
+
+  <div class="container">
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="card">
+      <h3>Digite a Senha do Grupo</h3>
+      <input type="password" id="password-input" placeholder="Senha de acesso">
+      <br>
+      <button onclick="checkPassword()">Entrar</button>
+      <p id="error-msg" style="color: red; display: none;">Senha incorreta!</p>
+    </div>
+
+    <!-- PAINEL PRINCIPAL DO GRUPO -->
+    <div id="main-screen" class="card hidden">
+      <h3>Membros do Grupo</h3>
+      <input type="text" id="member-name" placeholder="Nome do amigo">
+      <button onclick="addMember()">Adicionar Membro</button>
+
+      <ul id="members-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    // Configurações e Chaves do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBqWMb17OeeZDHBK_U1TMw2p6tMAz2x82g",
+      authDomain: "grupo-dos-melhores-amigos.firebaseapp.com",
+      projectId: "grupo-dos-melhores-amigos",
+      storageBucket: "grupo-dos-melhores-amigos.firebasestorage.app",
+      messagingSenderId: "712550275631",
+      appId: "1:712550275631:web:bbe1b57c155d50669f84da",
+      databaseURL: "https://grupo-dos-melhores-amigos-default-rtdb.firebaseio.com"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Verificação de Senha
+    function checkPassword() {
+      const input = document.getElementById("password-input").value;
+      if (input === "123Davi*") {
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("main-screen").classList.remove("hidden");
+        loadMembers();
+      } else {
+        document.getElementById("error-msg").style.display = "block";
+      }
+    }
+
+    // Salvar novo membro no Firebase
+    function addMember() {
+      const nameInput = document.getElementById("member-name");
+      const name = nameInput.value.trim();
+      if (name !== "") {
+        database.ref("membros").push({ nome: name });
+        nameInput.value = "";
+      }
+    }
+
+    // Carregar lista de membros em tempo real da memória na nuvem
+    function loadMembers() {
+      database.ref("membros").on("value", (snapshot) => {
+        const list = document.getElementById("members-list");
+        list.innerHTML = "";
+        snapshot.forEach((childSnapshot) => {
+          const member = childSnapshot.val();
+          const li = document.createElement("li");
+          li.textContent = member.nome;
+          list.appendChild(li);
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
