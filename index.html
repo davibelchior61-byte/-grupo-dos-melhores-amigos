@@ -1,4 +1,4 @@
-                                    .<!DOCTYPE html>
+                                    .            <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -15,7 +15,7 @@
             align-items: center;
         }
         header {
-            background-color: #ff9800;
+            background: linear-gradient(135deg, #ff9800, #ff5722);
             color: white;
             width: 100%;
             padding: 20px;
@@ -26,6 +26,29 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .user-avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #3f51b5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
         }
         .group-avatar-container {
             position: relative;
@@ -33,9 +56,10 @@
             height: 80px;
             border-radius: 50%;
             overflow: hidden;
-            background-color: #ddd;
+            background-color: #e0e0e0;
             cursor: pointer;
             border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .group-avatar-container img {
             width: 100%;
@@ -46,78 +70,98 @@
             background: white;
             padding: 20px;
             margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 400px;
             text-align: center;
+            border-top: 5px solid #3f51b5;
         }
         input, button, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1px solid #b0bec5;
+            border-radius: 6px;
             font-size: 16px;
             box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #3f51b5;
         }
         button {
-            background-color: #ff9800;
+            background: linear-gradient(135deg, #3f51b5, #303f9f);
             color: white;
             border: none;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         button:hover {
-            background-color: #e68900;
+            background: linear-gradient(135deg, #303f9f, #1a237e);
         }
         .member-list {
             text-align: left;
             margin-top: 20px;
         }
         .member-item {
-            background: #fff3e0;
-            padding: 10px;
+            background: #e8eaf6;
+            padding: 12px;
             margin-bottom: 8px;
-            border-radius: 5px;
-            border-left: 5px solid #ff9800;
+            border-radius: 8px;
+            border-left: 5px solid #3f51b5;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .member-item:hover {
+            transform: scale(1.01);
         }
         .member-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            background-color: #ccc;
+            background-color: #c5cae9;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #3f51b5;
+            font-weight: bold;
         }
         .member-info {
             flex-grow: 1;
+            color: #1a237e;
         }
         /* Botão flutuante do chat */
         #chat-float-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #25d366;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #00c853, #009624);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             cursor: pointer;
             z-index: 999;
             border: none;
+            transition: transform 0.2s;
         }
         #chat-float-btn:hover {
-            background-color: #1ebe57;
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #009624, #00701a);
         }
         /* Tela cheia do Chat */
         #chat-fullscreen {
@@ -132,7 +176,7 @@
             flex-direction: column;
         }
         .chat-header {
-            background-color: #25d366;
+            background: linear-gradient(135deg, #00c853, #009624);
             color: white;
             padding: 15px;
             display: flex;
@@ -140,6 +184,7 @@
             gap: 15px;
             font-size: 20px;
             font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .chat-back-btn {
             background: none;
@@ -155,19 +200,26 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            background-color: #efeae2;
+            background-color: #e8f5e9;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
         .chat-msg {
             background: #ffffff;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             max-width: 75%;
             word-break: break-all;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             align-self: flex-start;
+            border-left: 4px solid #00c853;
+        }
+        .chat-msg-author {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 3px;
         }
         .chat-msg img {
             max-width: 100%;
@@ -176,38 +228,40 @@
         }
         .chat-input-area {
             padding: 10px;
-            background-color: #f0f0f0;
+            background-color: #f1f8e9;
             display: flex;
             gap: 10px;
             align-items: center;
+            border-top: 1px solid #c8e6c9;
         }
         .chat-input-area input[type="text"] {
             margin: 0;
+            flex-grow: ket;
             flex-grow: 1;
         }
         .chat-input-area input[type="file"] {
             display: none;
         }
         .file-label {
-            background-color: #ccc;
-            padding: 10px 15px;
-            border-radius: 5px;
+            background-color: #c8e6c9;
+            padding: 12px 15px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            color: #333;
+            color: #2e7d32;
         }
         .file-label:hover {
-            background-color: #b3b3b3;
+            background-color: #a5d6a7;
         }
         .chat-input-area button {
             margin: 0;
             width: auto;
-            padding: 10px 20px;
-            background-color: #25d366;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #00c853, #009624);
         }
         .chat-input-area button:hover {
-            background-color: #1ebe57;
+            background: linear-gradient(135deg, #009624, #00701a);
         }
     </style>
 </head>
@@ -216,23 +270,36 @@
     <header>
         <div class="group-avatar-container" onclick="document.getElementById('group-file-input').click()">
             <img id="group-avatar-img" src="" alt="Foto do Grupo" style="display:none;">
-            <span id="group-avatar-placeholder" style="line-height:80px; font-size:12px; color:#555;">Foto</span>
+            <span id="group-avatar-placeholder" style="line-height:80px; font-size:12px; color:#333;">Foto</span>
         </div>
         <input type="file" id="group-file-input" accept="image/*" style="display:none" onchange="alterarFotoGrupo(event)">
         Grupo dos Melhores Amigos
+        <div id="user-badge-container" class="user-profile-badge" style="display:none;">
+            <div id="user-avatar-circle" class="user-avatar-circle">?</div>
+            <span id="user-badge-name"></span>
+        </div>
     </header>
 
+    <!-- Tela de Senha -->
     <div id="login-screen" class="container">
         <h2>Digite a Senha do Grupo</h2>
         <input type="password" id="senha-input" placeholder="Senha de acesso">
         <button onclick="verificarSenha()">Entrar</button>
     </div>
 
+    <!-- Tela de Identificação do Nome -->
+    <div id="name-screen" class="container" style="display: none;">
+        <h2>Como seus amigos te chamam?</h2>
+        <p style="font-size: 14px; color: #555;">Digite seu nome para entrar no chat.</p>
+        <input type="text" id="usuario-nome-input" placeholder="Seu nome">
+        <button onclick="salvarNomeUsuario()">Continuar</button>
+    </div>
+
     <div id="main-screen" class="container" style="display: none;">
-        <h3>Grupo do Davi</h3>
+        <h3 style="color: #1a237e;">Grupo do Davi</h3>
         
         <div class="member-list">
-            <h4>Membros do Grupo</h4>
+            <h4 style="color: #3f51b5;">Membros do Grupo</h4>
             <input type="text" id="nome-input" placeholder="Nome do amigo">
             <input type="text" id="profissao-input" placeholder="Profissão do membro">
             <button onclick="adicionarMembro()">Adicionar Membro</button>
@@ -248,7 +315,7 @@
     <div id="chat-fullscreen">
         <div class="chat-header">
             <button class="chat-back-btn" onclick="fecharChat()">➔</button>
-            <span>Chat</span>
+            <span>Chat do Grupo</span>
         </div>
         <div id="chat-messages" class="chat-messages"></div>
         <div class="chat-input-area">
@@ -267,6 +334,8 @@
             mensagens: []
         };
 
+        let usuarioAtual = localStorage.getItem("usuario_nome_atual") || "";
+
         function salvarLocalmente() {
             localStorage.setItem("dados_grupo_melhores_amigos", JSON.stringify(dadosGrupo));
         }
@@ -275,13 +344,43 @@
             const senha = document.getElementById("senha-input").value;
             if (senha === "123Davi*") {
                 document.getElementById("login-screen").style.display = "none";
-                document.getElementById("main-screen").style.display = "block";
-                document.getElementById("chat-float-btn").style.display = "flex";
-                carregarTudo();
+                if (usuarioAtual) {
+                    ativarSessaoUsuario();
+                } else {
+                    document.getElementById("name-screen").style.display = "block";
+                }
             } else {
                 alert("Senha incorreta!");
             }
         };
+
+        window.salvarNomeUsuario = function() {
+            const nome = document.getElementById("usuario-nome-input").value.trim();
+            if (nome === "") {
+                alert("Por favor, digite seu nome!");
+                return;
+            }
+            usuarioAtual = nome;
+            localStorage.setItem("usuario_nome_atual", usuarioAtual);
+            document.getElementById("name-screen").style.display = "none";
+            ativarSessaoUsuario();
+        };
+
+        function ativarSessaoUsuario() {
+            document.getElementById("main-screen").style.display = "block";
+            document.getElementById("chat-float-btn").style.display = "flex";
+            
+            // Exibir a bolinha com a inicial no cabeçalho
+            const badgeContainer = document.getElementById("user-badge-container");
+            const avatarCircle = document.getElementById("user-avatar-circle");
+            const badgeName = document.getElementById("user-badge-name");
+            
+            avatarCircle.innerText = usuarioAtual.charAt(0).toUpperCase();
+            badgeName.innerText = usuarioAtual;
+            badgeContainer.style.display = "flex";
+
+            carregarTudo();
+        }
 
         function comprimirImagem(file, callback) {
             const reader = new FileReader();
@@ -395,12 +494,12 @@
             listaDiv.innerHTML = "";
             
             if (dadosGrupo.membros.length === 0) {
-                listaDiv.innerHTML = "<p style='color:#777; font-size:14px;'>Nenhum membro adicionado ainda.</p>";
+                listaDiv.innerHTML = "<p style='color:#555; font-size:14px;'>Nenhum membro adicionado ainda.</p>";
                 return;
             }
 
             dadosGrupo.membros.forEach((membro) => {
-                const avatarHtml = membro.foto ? `<img src="${membro.foto}" class="member-avatar">` : `<div class="member-avatar" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">Foto</div>`;
+                const avatarHtml = membro.foto ? `<img src="${membro.foto}" class="member-avatar">` : `<div class="member-avatar">${membro.nome.charAt(0).toUpperCase()}</div>`;
                 
                 listaDiv.innerHTML += `
                     <div class="member-item" onclick="gerenciarMembro('${membro.id}', '${membro.nome}')">
@@ -450,6 +549,7 @@
 
         function salvarMensagemNaMemoria(texto, imagem) {
             const novaMensagem = {
+                autor: usuarioAtual || "Anônimo",
                 texto: texto,
                 imagem: imagem,
                 timestamp: Date.now()
@@ -470,9 +570,10 @@
             dadosGrupo.mensagens.sort((a, b) => a.timestamp - b.timestamp);
 
             dadosGrupo.mensagens.forEach((msg) => {
+                let autorHtml = `<div class="chat-msg-author">[${msg.autor || "Anônimo"}]:</div>`;
                 let textoHtml = msg.texto ? `<div>${msg.texto}</div>` : "";
                 let imgHtml = msg.imagem ? `<img src="${msg.imagem}">` : "";
-                chatMessages.innerHTML += `<div class="chat-msg">${textoHtml}${imgHtml}</div>`;
+                chatMessages.innerHTML += `<div class="chat-msg">${autorHtml}${textoHtml}${imgHtml}</div>`;
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
